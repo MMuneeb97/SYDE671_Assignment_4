@@ -149,10 +149,134 @@
 					</div>
 			</div>
 		
-		</div>  
-	</div>	
-			
-
+		</div> 
+	<p class="section-desc">Next, I will determine the fundamental matrix using normalized eight point algorithm. The fundamental
+	difference between this algorithm and standard linear least-squares eight point algorithm is in data conditioning before 
+	algebrai minimiation takes place.</p>
+		
+	<p class="section-desc">Standard algorithm builds the constraint matrix <strong>A</strong> from raw image pixel
+			cordinates <strong>(x, y)</strong> and sets up the homogenous function <strong>Af = 0</strong>. The problem with this
+			approach is that image cordinates generally span large pixel values, hundreds or thousands of pixels per image, which results
+			in large values of terms like <strong>x1x2</strong> compared to linears terms, x1, and contant terms, 1. This creates
+			massive range of magnitudes in the matrix <strong>A</strong> making the matrix ill-conditioned. Due to this variance in
+			the range of values in the matrix the unnormalized fundamental matrix is highly sensitive to noise and yields poor epipolar lines.</p>
+	<p class = "section-desc">The normalized eight point algorithm applies pre-processing cordinate transformation matrix (T1 and T2)
+	to both image point sets before running the eight-point algorithm. It does two main things. 1.Shifts the point coordinates so that their mean (centroid) is at the origin <strong>(0,0)</strong>.
+	2. Scales the coordinates isotropically so that the average root-mean-square (RMS) distance of the points from the origin is equal to <strong>sqrt(2)</strong> 
+	(meaning points typically lie within a radius of <strong>sqrt(2)</strong>. Additionally, after solving for the fundamental
+	matrix, the matrix is transformed back to the original pixel cordinate space using the similarity transforms drastically improving
+	numerical conditioning of the constraint matrix A. It ensures that all equations contribute equally to the least-squares minimization, 
+		resulting in a robust, highly accurate fundamental matrix that is invariant to coordinate choices. The algorithm implementation is shown in the code below.</p>	
+	<div class="code-block-container">
+			<pre><code>
+				# Question 1c
+				import numpy as np
+				from skimage.io import imread
+				import matplotlib.pyplot as plt
+				
+				file_names = [
+				    r"C:\Users\Muhammad Muneeb\Desktop\Documents\Masters\SYDE 671\Assignment 4\assignment 4 code\data\set1\pt_2D_1.txt", 
+				    r"C:\Users\Muhammad Muneeb\Desktop\Documents\Masters\SYDE 671\Assignment 4\assignment 4 code\data\set1\pt_2D_2.txt"
+				]
+				
+				def get_data_from_txt_file(filename, use_subset = False):
+				    with open(filename) as f:
+				        lines = f.read().splitlines() 
+				    number_pts = int(lines[0])
+				
+				    points = np.ones((number_pts, 3))
+				    for i in range(number_pts):
+				        split_arr = lines[i+1].split()
+				        if len(split_arr) == 2:
+				            y, x = split_arr
+				        else:
+				            x, y, z = split_arr
+				            points[i, 2] = float(z)
+				        points[i, 0] = float(x)
+				        points[i, 1] = float(y)
+				    return points
+				
+				def normalized_eight_point_alg(points1, points2):
+				    
+				    def to_inhomogenous(pts):
+				        if pts.shape[1] == 3:
+				            return pts[:, :2] / pts[:, 2:3]
+				        return pts[:, :2]
+				
+				    pts1_inh = to_inhomogenous(points1)
+				    pts2_inh = to_inhomogenous(points2)
+				
+				    N = pts1_inh.shape[0]
+				
+				    mean1 = np.mean(pts1_inh, axis=0)
+				    max_dist1 = np.max(np.sqrt(np.sum((pts1_inh - mean1)**2, axis=1)))
+				    scale1 = np.sqrt(2) / max_dist1 if max_dist1 > 0 else 1.0
+				
+				    T1 = np.array([
+				        [scale1, 0, -scale1 * mean1[0]],
+				        [0, scale1, -scale1 * mean1[1]],
+				        [0, 0, 1]
+				    ])
+				
+				    pts1_hom = np.column_stack([pts1_inh, np.ones(N)])
+				    pts1_norm = (T1 @ pts1_hom.T).T
+				
+				    mean2 = np.mean(pts2_inh, axis=0)
+				    max_dist2 = np.max(np.sqrt(np.sum((pts2_inh - mean2)**2, axis=1)))
+				    scale2 = np.sqrt(2) / max_dist2 if max_dist2 > 0 else 1.0
+				
+				    T2 = np.array([
+				        [scale2, 0, -scale2 * mean2[0]],
+				        [0, scale2, -scale2 * mean2[1]],
+				        [0, 0, 1]
+				    ])
+				
+				    pts2_hom = np.column_stack([pts2_inh, np.ones(N)])
+				    pts2_norm = (T2 @ pts2_hom.T).T
+				
+				    x1_n, y1_n = pts1_norm[:, 0], pts1_norm[:, 1]
+				    x2_n, y2_n = pts2_norm[:, 0], pts2_norm[:, 1]
+				
+				    A = np.column_stack([
+				        x2_n * x1_n,
+				        x2_n * y1_n,
+				        x2_n,
+				        y2_n * x1_n,
+				        y2_n * y1_n,
+				        y2_n,
+				        x1_n,
+				        y1_n,
+				        np.ones(N)
+				    ])
+				
+				    _, _, Vt = np.linalg.svd(A)
+				    f = Vt[-1, :]
+				    F_norm = f.reshape(3, 3)
+				
+				    U_f, S_f, Vt_f = np.linalg.svd(F_norm)
+				    S_f[-1] = 0.0
+				    F_norm_refined = U_f @ np.diag(S_f) @ Vt_f
+				
+				    F = T2.T @ F_norm_refined @ T1
+				
+				    return F
+				
+				# Load data points
+				points1 = get_data_from_txt_file(file_names[0])
+				points2 = get_data_from_txt_file(file_names[1])
+				
+				# Compute normalized fundamental matrix
+				F_matrix = normalized_eight_point_alg(points1, points2)
+				
+				# Set print options for 4 decimal places and suppress scientific notation
+				np.set_printoptions(precision=4, suppress=True)
+				
+				print("Estimated Normalized Fundamental Matrix:")
+				print(F_matrix)
+				</code></pre>
+			</div>
+	<p class="section-desc"></p>
+</div>
 	<!-- Mosaicing -->
 	<div class="section-block">
 		<h2 class="section-title">Section 2: Image Blending and Mosaicing</h2>
