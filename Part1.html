@@ -117,7 +117,31 @@
 				print("Estimated Fundamental Matrix (F_refined):")
 				print(F_matrix)	
 				</code></pre>
-			</div>
+			</div>	
+			<p class="section-desc">The funtion loads 2D point coordinates from two text files and using them to compute an 
+			unnormalized fundamental matrix via the linear least-squares eight-point algorithm. 
+			It first extracts the point arrays using a custom utility function, passes them into the eight-point algorithm 
+			where coordinates are converted to inhomogeneous form and assembled into a constraint matrix <strong>A</strong>, 
+			and applies Singular Value Decomposition (SVD) to extract the null-space solution corresponding to the fundamental matrix. 
+			Finally, it enforces the essential rank-2 constraint by zeroing out the smallest singular value of the estimated matrix and 
+			prints the resulting fundamental matrix configured to 7 decimal places.  The resulting Fundamental matrix is shown below.</p>
+	        <style>
+			  table.matrix-table {
+			    border-collapse: collapse;
+			    font-family: monospace;
+			  }
+			  table.matrix-table td {
+			    border: 1px solid #ccc;
+			    padding: 6px 12px;
+			    text-align: right;
+			  }
+			</style>
+			
+			<table class="matrix-table">
+			  <tr><td>0.0000</td><td>-0.0000</td><td>-0.0015</td></tr>
+			  <tr><td>-0.0000</td><td>-0.0000</td><td>-0.0114</td></tr>
+			  <tr><td>-0.0035</td><td>0.0141</td><td>0.9998</td></tr>
+			</table>
 			<div class="card">		
 				<div class="image-grid">
 					<div class="image-card">
