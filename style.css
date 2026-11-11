@@ -1,0 +1,262 @@
+/* ==========================================================================
+   1. RESET & BASE STYLES
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   2. NAVIGATION BAR
+   ========================================================================== */
+header {
+    background-color: #1e293b;
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+nav {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.logo {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #38bdf8;
+}
+
+/* ==========================================================================
+   3. MAIN CONTENT CONTAINER & CARD
+   ========================================================================== */
+main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    flex: 1;
+    width: 100%;
+}
+
+.card {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    text-align: center; /* Centers all inner headings, body text, and inline containers */
+}
+
+h1 {
+    color: #0f172a;
+    margin-bottom: 1rem;
+    font-size: 2.2rem;
+    text-align: center;
+}
+
+p {
+    margin-bottom: 1rem;
+    color: #475569;
+}
+
+/* ==========================================================================
+   4. BUTTONS & FORMS
+   ========================================================================== */
+.btn {
+    display: inline-block;
+    background-color: #0284c7;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0369a1;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left; /* Keeps form labels/inputs aligned left inside centered cards */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0284c7;
+}
+
+/* ==========================================================================
+   5. SECTIONS & SIDE-BY-SIDE IMAGE GRID (UPDATED FOR LARGER IMAGES)
+   ========================================================================== */
+.section-block {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-block:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.section-desc {
+    color: #475569;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+/* Expanded container width to allow larger side-by-side display */
+.image-grid {
+    display: flex;
+    flex-direction: row;       
+    justify-content: center;   
+    align-items: flex-start;   
+    gap: 2rem;               
+    max-width: 1200px;         /* Increased from 1000px to give cards more room */
+    margin: 2rem auto;       
+}
+
+/* Expanded individual card wrapper */
+.image-card {
+    flex: 1;                   
+    max-width: 580px;         /* Increased from 480px to make each image wider */
+    text-align: center;
+}
+
+/* Expanded image sizing controls */
+.image-card img {
+    width: 100%;               
+    max-height: 900px;         /* Increased from 700px so tall plots/pyramids can display much larger */
+    object-fit: contain;       
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    background-color: #f8fafc; 
+}
+
+.image-caption {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+/* ==========================================================================
+   6. FOOTER & RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+footer {
+    background-color: #0f172a;
+    color: #94a3b8;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+/* Mobile Responsiveness: Stack images vertically on small mobile screens */
+@media (max-width: 600px) {
+    .image-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .image-card {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* ==========================================================================
+   VIDEO CONTAINER STYLING (FIXED RESIZING)
+   ========================================================================== */
+.video-container {
+    width: 350px !important;       /* Hard limit matching image card width */
+    max-width: 100%;               /* Prevents overflow on mobile screens */
+    margin: 1.5rem auto;           /* Centers the video player */
+    text-align: center;
+}
+
+.video-container video {
+    width: 100% !important;
+    height: 250px !important;      /* Exact height matching your images */
+    object-fit: contain;           /* Scales video inside frame without stretching */
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #000;        /* Black letterbox background */
+    display: block;
+}
+
+.code-block-container {
+    background-color: #0f172a; /* Dark background matching your header/footer */
+    color: #e2e8f0;          /* Light text */
+    padding: 1.2rem;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+    text-align: left;        /* Keep code left-aligned even inside centered cards */
+    overflow-x: auto;        /* Adds a horizontal scrollbar if code is long */
+}
+
+.code-block-container pre {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
