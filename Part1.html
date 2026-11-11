@@ -133,7 +133,7 @@
 			  table.matrix-table td {
 			    border: 1px solid #ccc;
 			    padding: 6px 12px;
-			    text-align: right;
+			    text-align: center;
 			  }
 			</style>
 			
@@ -169,7 +169,6 @@
 		resulting in a robust, highly accurate fundamental matrix that is invariant to coordinate choices. The algorithm implementation is shown in the code below.</p>	
 	<div class="code-block-container">
 			<pre><code>
-				# Question 1c
 				import numpy as np
 				from skimage.io import imread
 				import matplotlib.pyplot as plt
@@ -275,7 +274,24 @@
 				print(F_matrix)
 				</code></pre>
 			</div>
-	<p class="section-desc"></p>
+	<p class="section-desc">The resulting normalized fundamental matrix is shown below.</p>
+	<style>
+			  table.matrix-table {
+			    border-collapse: collapse;
+			    font-family: monospace;
+			  }
+			  table.matrix-table td {
+			    border: 1px solid #ccc;
+			    padding: 6px 12px;
+			    text-align: right;
+			  }
+			</style>
+			
+			<table class="matrix-table">
+			  <tr><td>0.0000003</td><td>-0.0000023</td><td>0.0000371</td></tr>
+			  <tr><td>-0.0000022</td><td>-0.0000001</td><td>-0.0028175</td></tr>
+			  <tr><td>-0.0003669</td><td>0.0038734</td><td>0.0618849</td></tr>
+			</table>
 </div>
 	<!-- Mosaicing -->
 	<div class="section-block">
