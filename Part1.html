@@ -311,12 +311,58 @@
 			    <tr><td>-0.0003669</td><td>0.0038734</td><td>0.0618849</td></tr>
 			  </table>
 			</div>
+			<p class="section-desc">Epipolar lines are calculated using the </p>
+			<div class="code-block-container">
+			<pre><code>
+				def compute_distance_to_epipolar_lines(points1, points2, F):
+			        if points1.shape[1] == 2:
+			            pts1_hom = np.column_stack([points1, np.ones(points1.shape[0])])
+			        else:
+			            pts1_hom = points1
+			    
+			        if points2.shape[1] == 2:
+			            pts2_hom = np.column_stack([points2, np.ones(points2.shape[0])])
+			        else:
+			            pts2_hom = points2
+			    
+			        lines = (F.T @ pts2_hom.T).T
+			    
+			        numerator = np.abs(np.sum(pts1_hom * lines, axis=1))
+			        denominator = np.sqrt(lines[:, 0]**2 + lines[:, 1]**2)
+			        distances = numerator / denominator
+			        average_distance = np.mean(distances)
+			
+			        return average_distance
+			</code></pre>
+			</div>
+			<p class="section-desc">
+			  The function <code>compute_distance_to_epipolar_lines</code> calculates the geometric reprojection error by finding 
+			  the perpendicular distance from each point in the first image to its corresponding epipolar line. 
+			  Mathematically, given a homogeneous point $\mathbf{x} = [x, y, 1]^T$ in the first image and its matching point $\mathbf{x}'$ in the second image, 
+			  the epipolar line equation $\mathbf{l} = [a, b, c]^T$ in the first image is determined by the transposed fundamental matrix:
+			</p>
+			
+			<div style="text-align: center; margin: 15px 0;">
+			  $$\mathbf{l} = F^T \mathbf{x}'$$
+			</div>
+			
+			<p class="section-desc">
+			  For a line defined by $ax + by + c = 0$, the perpendicular distance $d$ 
+			  from a homogeneous point $\mathbf{x} = [x, y, 1]^T$ to this line is given by the algebraic point-line distance formula:
+			</p>
+			
+			<div style="text-align: center; margin: 15px 0;">
+			  $$d = \frac{|\mathbf{x}^T \mathbf{l}|}{\sqrt{a^2 + b^2}}$$
+			</div>
+	
 			<p class="section-desc">After calculating the fundamental matrices with the two methods, Next step is to calculate
 			the epipolar lines and the distance of the smallest cordinate for each dataset from its corresponding epipolar line to
 			determine the accuracy of the fundamental matrix. The distances computed are shown in the table below. The LLS 8-point
 			algorithm produces vast distances due to ill-conditioning nature of the raw pixels.</p>
+			
 			<p class="section-desc">Whereas, the normalized 8-point algorithm produces significantly smaller distances and much more
 			accurate and visually leaner epipolar lines.</p>
+		
 
 			<style>
 		  .table-container {
@@ -388,8 +434,8 @@
             <b>Figure 2:</b> Epipolar lines estimated using the normalized eight-point algorithm (Hartley Normalization). The lines pass precisely through the corresponding feature points.
         </p>
     </div>
-</div>
-	</div>		
+</div>	
+</div>		
 	<!-- Mosaicing -->
 	<div class="section-block">
 		<h2 class="section-title">Section 2: Image Blending and Mosaicing</h2>
