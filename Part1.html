@@ -29,7 +29,7 @@
             <p style="text-align: left;">In this blog we will be reviewing the concepts from assignment 4. Assignment 4 focuses on Fundamental matrix estimation based on point correspondances. 
  </p>
             
-            <!-- SECTION 1: INTRODUCTION TO CONVOLUTION -->
+           
 <div class="section-block">
 		<h2 class="section-title">Section 1: Fundamental Matrix Estimation From Point Correspondences</h2>
 		<p class="section-desc">In this section I use the 2D data points from images 1 and 2 in aata set 1.
@@ -275,7 +275,17 @@
 				print(F_matrix)
 				</code></pre>
 			</div>
-	<p class="section-desc">The resulting normalized fundamental matrix is shown below.</p>
+	<p class="section-desc">The normalized eight point algorithm computes the fundamental matrix from matching point coordinates
+	by first converting homogenous inputs into inhomogenous 2D coordinates. It then applies the Hartley normalization to both sets of
+	coordinates seperately, shifting their centroids to the origin and scaling them so the root mean square distance is equal to
+	<strong>sqrt(2)</strong>. This pre-processing prevents large coordinate values from ill conditioning the linear system.
+	Once the coordinates are normalized, the algorithm constructs a <strong>N X 9 matrix A</strong> representing the epipolar
+	constraints and solves the homogenous system <strong>Af = 0</strong> using <strong>SVD</strong> taking the right singular vector 
+	associated with the smallest singular value as the initial fundamental matrix estimate. To satisfy the essential algebraic requirement 
+	that a valid fundamental matrix must have a determinant of zero, a secondary SVD is performed on the estimate to zero out its smallest 
+	singular value. Finally, the resulting matrix is denormalized back to the original image coordinate space using the inverse similarity 
+	transforms defined by the normalization matrices, yielding the final refined fundamental matrix. 
+	The resulting normalized fundamental matrix is shown below.</p>
 	<style>
 			  .matrix-container {
 			    display: flex;
