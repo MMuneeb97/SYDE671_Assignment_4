@@ -145,9 +145,9 @@
 			
 			<div class="matrix-container">
 			  <table class="matrix-table">
-			    <tr><td>0.0000</td><td>-0.0000</td><td>-0.0015</td></tr>
-			    <tr><td>-0.0000</td><td>-0.0000</td><td>-0.0114</td></tr>
-			    <tr><td>-0.0035</td><td> 0.0141</td><td> 0.9998</td></tr>
+			    <tr><td>0.0000016</td><td>-0.0000082</td><td>-0.0015044</td></tr>
+			    <tr><td>-0.0000059</td><td>-0.0000003</td><td>-0.0113608</td></tr>
+			    <tr><td>-0.0035231</td><td>0.0141454</td><td>0.9998281</td></tr>
 			  </table>
 			</div>
 		
@@ -311,7 +311,78 @@
 			    <tr><td>-0.0003669</td><td>0.0038734</td><td>0.0618849</td></tr>
 			  </table>
 			</div>
-</div>
+			<p class="section-desc">After calculating the fundamental matrices with the two methods, Next step is to calculate
+			the epipolar lines and the distance of the smallest cordinate for each dataset from its corresponding epipolar line to
+			determine the accuracy of the fundamental matrix. The distances computed are shown in the table below. The LLS 8-point
+			algorithm produces vast distances due to ill-conditioning nature of the raw pixels.</p>
+			<p class="section-desc">Whereas, the normalized 8-point algorithm produces significantly smaller distances and much more
+			accurate and visually leaner epipolar lines.</p>
+
+			<style>
+		  .table-container {
+		    display: flex;
+		    justify-content: center;
+		    width: 100%;
+		    margin: 20px 0;
+		  }
+		  table.comparison-table {
+		    border-collapse: collapse;
+		    font-family: sans-serif;
+		    text-align: center;
+		    width: 80%;
+		    max-width: 600px;
+		  }
+		  table.comparison-table th, 
+		  table.comparison-table td {
+		    border: 1px solid #ccc;
+		    padding: 10px 14px;
+		  }
+		  table.comparison-table th {
+		    background-color: #f4f4f4;
+		    font-weight: bold;
+		  }
+		  table.comparison-table td.metric-name {
+		    text-align: left;
+		    font-weight: 500;
+		  }
+		</style>
+		
+		<div class="table-container">
+		  <table class="comparison-table">
+		    <thead>
+		      <tr>
+		        <th>Dataset / Image View</th>
+		        <th>LLS 8-Point Algorithm (px)</th>
+		        <th>Normalized 8-Point Algorithm (px)</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr>
+		        <td class="metric-name">Image 1 Epipolar Line Distance</td>
+		        <td>Distance to lines in image 1 for LLS: 28.025662937524327</td>
+		        <td>Distance to lines in image 2 for LLS: 25.162875800028743</td>
+		      </tr>
+		      <tr>
+		        <td class="metric-name">Image 2 Epipolar Line Distance</td>
+		        <td>0.8910830901829346</td>
+		        <td>0.8291883772732451</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</div>
+		
+		<p class="section-desc">The epipolar lines produced with both the methods are shown below.</p>
+			<div class="image-grid">
+			<div class="image-card">
+				<img src="images\Automated_Correspondance.PNG" alt="img8">
+			</div>
+		</div>
+		<div class="image-grid">
+			<div class="image-card">
+				<img src="images\Automated Mosaic.PNG" alt="img8">
+			</div>
+		</div>
+	</div>		
 	<!-- Mosaicing -->
 	<div class="section-block">
 		<h2 class="section-title">Section 2: Image Blending and Mosaicing</h2>
