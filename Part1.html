@@ -346,17 +346,17 @@
 			<p class="section-desc">
 			  The function <code>compute_distance_to_epipolar_lines</code> calculates the geometric reprojection error by finding 
 			  the perpendicular distance from each point in the first image to its corresponding epipolar line. 
-			  Mathematically, given a homogeneous point $${x} = [x, y, 1]^T$$ in the first image and its matching point $$f{x}'$$ in the second image, 
-			  the epipolar line equation $$f{l} = [a, b, c]^T$$ in the first image is determined by the transposed fundamental matrix:
+			  Mathematically, given a homogeneous point $${x} = [x, y, 1]^T$$ in the first image and its matching point $${x}'$$ in the second image, 
+			  the epipolar line equation $${l} = [a, b, c]^T$$ in the first image is determined by the transposed fundamental matrix:
 			</p>
 			
 			<div style="text-align: center; margin: 15px 0;">
-			  $$f{l} = F^T \f{x}'$$
+			  $${l} = F^T \f{x}'$$
 			</div>
 			
 			<p class="section-desc">
 			  For a line defined by $$ax + by + c = 0$$, the perpendicular distance $d$ 
-			  from a homogeneous point $$f{x} = [x, y, 1]^T$$ to this line is given by the algebraic point-line distance formula:
+			  from a homogeneous point $$f({x}) = [x, y, 1]^T$$ to this line is given by the algebraic point-line distance formula:
 			</p>
 			
 			<div style="text-align: center; margin: 15px 0;">
