@@ -443,6 +443,142 @@
         </p>
     </div>
 </div>	
+	<p class="section-desc">Next I implement the Hartley Ractification algortithem that is used to warp a pair of images such that
+	their corresponding epipolar lines are parallel to the horontal axis simplifying the correspondance searches to a horizontal
+	1D scan instead of a 2D scan.</p>
+	<p class="section-desc">The algorithm begins by extracting the epipoles from the fundamental matrix calculated in the previous section.
+	In the <Strong>compute_epipole</Strong> function, the null vector of $$F^T$$ is isolated using SVD satisfying the epipolar constraint
+	$$F^Te2 = 0$$ for the second image's epipole e2.</p>
+	<p class="section-desc">Next, the <Strong>compute_H</Strong> function constructs three geometric trnsformations.</p>
+	<P class="section-desc">1. A translational matrix that shifts the image center to origin.</P>
+	<p class="section-desc">2. A rotation matrix that aligns the translated epipole with the horiontal axis.</p>
+	<p class="section-desc">3. A projectve transformation matrix that sends the epipole to infinity.</p>
+	<p class="section-desc">Combining these three steps yields that rectifying homography <strong>H = T^-1GRT</strong> for
+	a given image and epipole. To ensure the pair of images is rectified in a matching, compatible way, 
+	<strong>compute_matching_homographies</strong> computes the second image's homography $H_2 = \text{compute\_H}(\mathbf{e}_2, \text{im}_2)$ and 
+	establishes an initial transformation $H_0 = H_2 M$. Here, $M$ is the mapping matrix defined by $M = [\mathbf{e}_2]_\times F + \mathbf{e}_2 \mathbf{v}^T$, with $[\mathbf{e}_2]_\times$ 
+	representing the skew-symmetric cross-product matrix of $\mathbf{e}_2$ and $\mathbf{v}^T = [1, 1, 1]$. Because mapping the epipole to infinity introduces projective distortion, 
+	an additional affine correction homography $H_A$ is introduced to minimize image skew and ensure optimal alignment.
+	The parameters of $HA$ are solved via linear least squares ($\text{np.linalg.lstsq}$) by minimizing the squared distance between the transformed feature points. 
+	The final matching homography for the first image is then given by $H_1 = H_A H_2 M$, completing the geometric rectification pipeline for both images</p>
+	<p class="section-desc">The algorithm and the resulting image is shown below.</p>
+
+		<div class="code-block-container">
+			<pre><code>
+				def compute_epipole(F):
+			    _, _, Vt = np.linalg.svd(F.T)
+			    e = Vt[-1, :]
+			
+			    if abs(e[2]) > 1e-10:
+			        e = e / e[2]
+			    else:
+			        e = e / np.linalg.norm(e)
+			
+			    return e
+
+				def compute_H(e, im):
+				height, width = im.shape[0], im.shape[1]
+			
+				# Translate image center to the origin
+				T = np.array([
+					[1, 0, -width / 2.0],
+					[0, 1, -height / 2.0],
+					[0, 0, 1]
+				])
+			
+				e_translated = T @ e
+				e1, e2 = e_translated[0], e_translated[1]
+			
+				# Rotate epipole onto the x-axis
+				alpha = 1 if e1 >= 0 else -1
+				norm_e = np.sqrt(e1**2 + e2**2)
+			
+				if norm_e > 1e-10:
+					c1 = alpha * (e1 / norm_e)
+					c2 = alpha * (e2 / norm_e)
+				else:
+					c1, c2 = 1.0, 0.0
+			
+				R = np.array([
+					[c1, c2, 0],
+					[-c2, c1, 0],
+					[0, 0, 1]
+				])
+			
+				e_rotated = R @ e_translated
+				f = e_rotated[0]
+			
+				# Send the epipole to infinity
+				if abs(f) > 1e-10:
+					G = np.array([
+						[1, 0, 0],
+						[0, 1, 0],
+						[-1.0 / f, 0, 1]
+					])
+				else:
+					G = np.eye(3)
+			
+				T_inv = np.linalg.inv(T)
+				H = T_inv @ G @ R @ T
+			
+				return H
+
+				def compute_matching_homographies(e2, F, im2, points1, points2):
+			    H2 = compute_H(e2, im2)
+			
+			    e_x = np.array([
+			        [0, -e2[2], e2[1]],
+			        [e2[2], 0, -e2[0]],
+			        [-e2[1], e2[0], 0]
+			    ])
+			
+			    v_T = np.array([1, 1, 1])
+			    M = e_x @ F + np.outer(e2, v_T)
+			
+			    def to_homogeneous(pts):
+			        if pts.shape[1] == 3:
+			            pts = pts[:, :2] / pts[:, 2:3]
+			        else:
+			            pts = pts[:, :2]
+			        return np.column_stack([pts, np.ones(pts.shape[0])])
+			
+			    pts1_hom = to_homogeneous(points1)
+			    pts2_hom = to_homogeneous(points2)
+			
+			    # H0 maps image 1 into the rectified frame (up to the affine H_A)
+			    H0 = H2 @ M
+			
+			    # FIX: fit H_A on the points AFTER H0 / H2 are applied
+			    p1_hat = (H0 @ pts1_hom.T).T
+			    p1_hat = p1_hat / p1_hat[:, 2:3]
+			
+			    p2_hat = (H2 @ pts2_hom.T).T
+			    p2_hat = p2_hat / p2_hat[:, 2:3]
+			
+			    # Solve  p1_hat @ a = x-coordinates of p2_hat  (least squares)
+			    a, _, _, _ = np.linalg.lstsq(p1_hat, p2_hat[:, 0], rcond=None)
+			
+			    H_A = np.array([
+			        [a[0], a[1], a[2]],
+			        [0,    1,    0],
+			        [0,    0,    1]
+			    ])
+			
+			    H1 = H_A @ H0
+			
+			    return H1, H2
+
+				</code></pre>
+			</div>
+	
+	<div class="image-grid">
+    <div class="image-card">
+        <img src="images\Ractified.PNG" alt="Ractified">
+        <p style="text-align: center; font-size: 0.9rem; color: #444; margin-top: 8px; font-family: sans-serif;">
+            <b>Figure 1:</b> Ractified Epipolar lines estimated using the Hartley Ractification Algorithm.
+        </p>
+    </div>
+</div>
 </div>		
 	<!-- Mosaicing -->
 	<div class="section-block">
