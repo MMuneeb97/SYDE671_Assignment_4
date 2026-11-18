@@ -581,6 +581,74 @@
 		<p class="section-desc">Without known camera calibration parameters or absolute depth measurements, Tomasi-Kanade factorization can only recover the 3D structure 
 		up to an arbitrary 3D linear transformation (or scaled Euclidean reconstruction), which explains why the axes lengths and overall scale differ between your 
 		factorization plot and the ground truth.</p>
+
+		<p class="section-desc">Lastly, I implement a complete multi-view structure from motion (SFM) and bundle adjustment pipeline
+		for computer vision.</p>
+		<p>It begins by decomposing the Essential matrix into four possible camera rotation and translation pairings using singular 
+		value decomposition, and resolves the correct camera pose via cheirality constraints (positive depth in both camera frames). 
+		It then constructs linear DLT triangulations for 3D points and refines them using an iterative Gauss-Newton non-linear optimization 
+		routine driven by analytical reprojection error Jacobians. Finally, the script executes unit tests across all major modules and runs 
+		the full SfM pipeline on image sequences to generate and render a 3D point cloud of a statue.</p>
+		<p class="section-desc">The output of the algorithm and the 3D point cloud of the stture are shown below.</p>
+		<div class="code-block-container">
+				<pre><code>
+				--------------------------------------------------------------------------------
+				Part A: Check your matrices against the example R,T
+				--------------------------------------------------------------------------------
+				Example RT:
+				 [[ 0.9736 -0.0988 -0.2056  0.9994]
+				 [ 0.1019  0.9948  0.0045 -0.0089]
+				 [ 0.2041 -0.0254  0.9786  0.0331]]
+				
+				Estimated RT:
+				 [array([[ 0.98305251, -0.11787055, -0.14040758,  0.99941228],
+					   [-0.11925737, -0.99286228, -0.00147453, -0.00886961],
+					   [-0.13923158,  0.01819418, -0.99009269,  0.03311219]]), array([[ 0.98305251, -0.11787055, -0.14040758, -0.99941228],
+					   [-0.11925737, -0.99286228, -0.00147453,  0.00886961],
+					   [-0.13923158,  0.01819418, -0.99009269, -0.03311219]]), array([[ 0.97364135, -0.09878708, -0.20558119,  0.99941228],
+					   [ 0.10189204,  0.99478508,  0.00454512, -0.00886961],
+					   [ 0.2040601 , -0.02537241,  0.97862951,  0.03311219]]), array([[ 0.97364135, -0.09878708, -0.20558119, -0.99941228],
+					   [ 0.10189204,  0.99478508,  0.00454512,  0.00886961],
+					   [ 0.2040601 , -0.02537241,  0.97862951, -0.03311219]])]
+				--------------------------------------------------------------------------------
+				Part B: Check that the difference from expected point
+				is near zero
+				--------------------------------------------------------------------------------
+				Difference:  0.0029243053036863698
+				--------------------------------------------------------------------------------
+				Part C: Check that the difference from expected error/Jacobian
+				is near zero
+				--------------------------------------------------------------------------------
+				Error Difference:  8.301300130674275e-07
+				Jacobian Difference:  1.817115702351657e-08
+				--------------------------------------------------------------------------------
+				Part D: Check that the reprojection error from nonlinear method
+				is lower than linear method
+				--------------------------------------------------------------------------------
+				Linear method error: 98.73542356894187
+				Nonlinear method error: 95.59481784846034
+				--------------------------------------------------------------------------------
+				Part E: Check your matrix against the example R,T
+				--------------------------------------------------------------------------------
+				Example RT:
+				 [[ 0.9736 -0.0988 -0.2056  0.9994]
+				 [ 0.1019  0.9948  0.0045 -0.0089]
+				 [ 0.2041 -0.0254  0.9786  0.0331]]
+				
+				Estimated RT:
+				 [[ 0.97364135 -0.09878708 -0.20558119  0.99941228]
+				 [ 0.10189204  0.99478508  0.00454512 -0.00886961]
+				 [ 0.2040601  -0.02537241  0.97862951  0.03311219]]
+			</code></pre>
+		</div>
+		<div class="image-grid">
+				<div class="image-card">
+					<img src="images\p4_1.png" alt="Unnormalized Epipolar Lines">
+					<p style="text-align: center; font-size: 0.9rem; color: #444; margin-top: 8px; font-family: sans-serif;">
+						<b>Figure 2:</b>3D point cloud of statue
+					</p>
+				</div>
+			</div>
 	    </div>
 	</div>
 	</div>		
